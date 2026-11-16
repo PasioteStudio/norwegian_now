@@ -16,6 +16,17 @@ bun dev
 
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
+## Text-to-speech service
+
+The games send `POST {"text":"...","language":"no"}` to
+`http://192.168.1.20:8000/tts` and play the returned WAV audio. To use a
+different endpoint, set `NEXT_PUBLIC_TTS_ENDPOINT` before building. For
+GitHub Actions deployments, set the repository variable with that name.
+Because the browser calls the service directly, it must be reachable from the
+user's device and allow CORS from the website's origin. If the website is
+served over HTTPS, browsers may block this HTTP endpoint as mixed content; in
+that case, the TTS service must also be available over HTTPS.
+
 You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
 
 This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.

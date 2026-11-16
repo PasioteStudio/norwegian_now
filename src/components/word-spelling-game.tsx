@@ -2,7 +2,7 @@
 
 import { useEffect, useState, type FormEvent } from "react";
 import { getRandomBokmalWord, type WordEntry } from "../lib/wiktionary";
-import { speakNorwegian } from "../lib/speech";
+import { speakNorwegian, stopSpeaking } from "../lib/speech";
 import GameShell from "./game-shell";
 
 type GameStatus = "ready" | "loading" | "playing" | "answered";
@@ -20,7 +20,7 @@ export default function WordSpellingGame() {
 
   useEffect(() => {
     return () => {
-      window.speechSynthesis?.cancel();
+      stopSpeaking();
     };
   }, []);
 

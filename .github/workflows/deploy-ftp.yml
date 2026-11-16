@@ -30,6 +30,8 @@ jobs:
         run: npm ci
 
       - name: Build static frontend
+        env:
+          NEXT_PUBLIC_TTS_ENDPOINT: ${{ vars.NEXT_PUBLIC_TTS_ENDPOINT }}
         run: npm run build
 
       - name: Upload static site artifact

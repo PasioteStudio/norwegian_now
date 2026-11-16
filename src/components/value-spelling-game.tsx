@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useState, type FormEvent } from "react";
 import GameShell from "./game-shell";
-import { speakNorwegian } from "../lib/speech";
+import { speakNorwegian, stopSpeaking } from "../lib/speech";
 
 type GameStatus = "ready" | "playing" | "wrong" | "correct";
 
@@ -62,7 +62,7 @@ export default function ValueSpellingGame() {
 
   useEffect(() => {
     return () => {
-      window.speechSynthesis?.cancel();
+      stopSpeaking();
     };
   }, []);
 
