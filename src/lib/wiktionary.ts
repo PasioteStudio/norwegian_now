@@ -1,3 +1,5 @@
+import axios from "axios";
+
 export type WordEntry = {
   word: string;
   definition: string;
@@ -123,12 +125,18 @@ export async function getRandomBokmalWord(
       origin: "*",
     }).toString();
 
-    const searchResponse = await fetch(searchUrl, { cache: "no-store" });
-    if (!searchResponse.ok) {
-      throw new Error(`Søk i Wiktionary mislyktes (HTTP ${searchResponse.status}).`);
+    const searchResponse = await axios.get<SearchResponse>(searchUrl.toString(), {
+      adapter: "fetch",
+      fetchOptions: { cache: "no-store" },
+      validateStatus: () => true,
+    });
+    if (searchResponse.status < 200 || searchResponse.status >= 300) {
+      throw new Error(
+        `Søk i Wiktionary mislyktes (HTTP ${searchResponse.status}).`,
+      );
     }
 
-    const searchData = (await searchResponse.json()) as SearchResponse;
+    const searchData = searchResponse.data;
     const candidates = (searchData.query?.search ?? []).filter(isSearchResult);
     if (candidates.length === 0) {
       continue;
@@ -144,14 +152,21 @@ export async function getRandomBokmalWord(
       origin: "*",
     }).toString();
 
-    const extractResponse = await fetch(extractUrl, { cache: "no-store" });
-    if (!extractResponse.ok) {
+    const extractResponse = await axios.get<ExtractResponse>(
+      extractUrl.toString(),
+      {
+        adapter: "fetch",
+        fetchOptions: { cache: "no-store" },
+        validateStatus: () => true,
+      },
+    );
+    if (extractResponse.status < 200 || extractResponse.status >= 300) {
       throw new Error(
         `Kunne ikke hente ord fra Wiktionary (HTTP ${extractResponse.status}).`,
       );
     }
 
-    const extractData = (await extractResponse.json()) as ExtractResponse;
+    const extractData = extractResponse.data;
     const entries = Object.values(extractData.query?.pages ?? {}).flatMap(
       (page) => {
         if (

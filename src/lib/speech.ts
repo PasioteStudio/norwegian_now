@@ -1,3 +1,5 @@
+import axios from "axios";
+
 const TTS_ENDPOINT =
   process.env.NEXT_PUBLIC_TTS_ENDPOINT || "http://192.168.1.20:8000/tts";
 
@@ -27,18 +29,22 @@ export async function speakNorwegian(text: string): Promise<void> {
   activeRequest = request;
 
   try {
-    const response = await fetch(TTS_ENDPOINT, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ text, language: "no" }),
-      signal: request.signal,
-    });
+    const response = await axios.post<Blob>(
+      TTS_ENDPOINT,
+      { text, language: "no" },
+      {
+        withCredentials: true,
+        responseType: "blob",
+        signal: request.signal,
+        validateStatus: () => true,
+      },
+    );
 
-    if (!response.ok) {
+    if (response.status < 200 || response.status >= 300) {
       throw new Error(`TTS request failed (${response.status}).`);
     }
 
-    const audioBlob = await response.blob();
+    const audioBlob = response.data;
     if (audioBlob.size === 0) {
       throw new Error("The TTS service returned an empty audio file.");
     }
